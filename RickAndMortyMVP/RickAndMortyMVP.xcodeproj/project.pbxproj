@@ -14,7 +14,7 @@
 		64F7510B2E04323000D31359 /* Exceptions for "RickAndMortyMVP" folder in "RickAndMortyMVP" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Support/Info.plist,
+				Info.plist,
 			);
 			target = 64F750F82E04322E00D31359 /* RickAndMortyMVP */;
 		};
