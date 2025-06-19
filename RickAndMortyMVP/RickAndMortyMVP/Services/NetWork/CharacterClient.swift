@@ -7,7 +7,6 @@
 
 import Foundation
 
-protocol RMClient{
+protocol CharacterClient {
     func fetchCharacters(page: Int?, filters: [String: String]?) async throws -> RMCharacterResponse
-    func fetchEpisodes(ids: [String]) async throws -> [RMEpisode]
 }

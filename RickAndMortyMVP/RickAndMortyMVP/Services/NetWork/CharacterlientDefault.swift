@@ -7,9 +7,9 @@
 
 import Foundation
 
-final class RMClientDefault: RMClient {
+final class CharacterClientDefault: CharacterClient {
     
-    private let networkService: NetworkService
+    let networkService: NetworkService
     
     init(networkService: NetworkService) {
         self.networkService = networkService
@@ -30,15 +30,6 @@ final class RMClientDefault: RMClient {
             endpoint: "character",
             queryItems: queryItems.isEmpty ? nil : queryItems
         )
-    }
-    
-    func fetchEpisodes(ids: [String]) async throws -> [RMEpisode] {
-        func getNumberFromString(if stringId: String) -> String {
-            stringId.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
-        }
-        let ids = ids.map(getNumberFromString).joined(separator: ",")
-        
-        return try await networkService.request(endpoint: "episode/[\(ids)]", queryItems: nil)
     }
 }
 
