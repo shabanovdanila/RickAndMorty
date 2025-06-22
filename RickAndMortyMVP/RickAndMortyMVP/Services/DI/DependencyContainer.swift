@@ -20,7 +20,7 @@ final class DependencyContainer {
     }
     
     // MARK: - Clients
-    func createCharacterlient() -> CharacterClientDefault {
+    func createCharacterСlient() -> CharacterClientDefault {
         CharacterClientDefault(networkService: sharedNetWorkService)
     }
     

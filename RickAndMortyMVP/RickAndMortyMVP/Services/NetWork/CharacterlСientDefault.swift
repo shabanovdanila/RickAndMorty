@@ -15,7 +15,7 @@ final class CharacterClientDefault: CharacterClient {
         self.networkService = networkService
     }
     
-    func fetchCharacters(page: Int? = nil, filters: [String: String]? = nil) async throws -> RMCharacterResponse {
+    func fetchCharacters(page: Int? = nil, filters: CharacterFilter? = nil) async throws -> RMCharacterResponse {
         var queryItems: [URLQueryItem] = []
         
         if let page {
@@ -23,7 +23,7 @@ final class CharacterClientDefault: CharacterClient {
         }
         
         if let filters {
-            queryItems += filters.map { URLQueryItem(name: $0.key, value: $0.value) }
+            queryItems += filters.toQueryItems()
         }
         
         return try await networkService.request(
@@ -32,4 +32,3 @@ final class CharacterClientDefault: CharacterClient {
         )
     }
 }
-

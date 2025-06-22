@@ -8,5 +8,5 @@
 import Foundation
 
 protocol CharacterClient {
-    func fetchCharacters(page: Int?, filters: [String: String]?) async throws -> RMCharacterResponse
+    func fetchCharacters(page: Int?, filters: CharacterFilter?) async throws -> RMCharacterResponse
 }
