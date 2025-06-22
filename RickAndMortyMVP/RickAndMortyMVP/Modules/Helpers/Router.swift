@@ -15,7 +15,7 @@ protocol RouterMain {
 
 protocol Router: RouterMain {
     func initialViewController()
-    func showDetail(character: RMCharacter)
+    //func showDetail(character: RMCharacter)
     func popToRoot()
 }
 
@@ -37,12 +37,12 @@ final class RouterDefault: Router {
         }
     }
     
-    func showDetail(character: RMCharacter) {
-        if let navigationController {
-            guard let detailVC = assemblyBuilder?.createCharacterDetailModule(character: character, router: self) else { return }
-            navigationController.pushViewController(detailVC, animated: true)
-        }
-    }
+//    func showDetail(character: RMCharacter) {
+//        if let navigationController {
+//            guard let detailVC = assemblyBuilder?.createCharacterDetailModule(character: character, router: self) else { return }
+//            navigationController.pushViewController(detailVC, animated: true)
+//        }
+//    }
     
     func popToRoot() {
         if let navigationController {

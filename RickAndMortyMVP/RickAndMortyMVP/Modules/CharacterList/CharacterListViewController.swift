@@ -7,13 +7,175 @@
 
 import UIKit
 
-class CharacterListViewController: UIViewController {
+import UIKit
+
+final class CharacterListViewController: UIViewController {
     
-    private let presenter: 
+    //TODO: - check is correct realization
+    private var characters: [RMCharacter] = []
     
+    // MARK: - UI Elements
+    private lazy var tableView: UITableView = {
+        let tableView = UITableView()
+        tableView.register(CharacterCellView.self, forCellReuseIdentifier: CharacterCellView.reuseIdentifier)
+        tableView.dataSource = self
+        tableView.delegate = self
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = 100
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.refreshControl = refreshControl
+        return tableView
+    }()
+    
+    private lazy var refreshControl: UIRefreshControl = {
+        let control = UIRefreshControl()
+        control.addTarget(self, action: #selector(refreshData), for: .valueChanged)
+        return control
+    }()
+    
+    private lazy var loadingIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.hidesWhenStopped = true
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        return indicator
+    }()
+    
+    private lazy var filterButton: UIBarButtonItem = {
+        let button = UIBarButtonItem(
+            image: UIImage(systemName: "line.3.horizontal.decrease.circle"),
+            style: .plain,
+            target: self,
+            action: #selector(showFilterOptions))
+        return button
+    }()
+    
+    // MARK: - Properties
+    var presenter: CharacterListPresenterInput!
+    
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupUI()
+        presenter.viewDidLoad()
+    }
+    
+    // MARK: - Setup
+    private func setupUI() {
+        title = "Characters"
+        view.backgroundColor = .systemBackground
+        navigationItem.rightBarButtonItem = filterButton
         
-        // Do any additional setup after loading the view.
+        view.addSubview(tableView)
+        view.addSubview(loadingIndicator)
+        
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(equalTo: view.topAnchor),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            loadingIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            loadingIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
+    }
+    
+    // MARK: - Actions
+    @objc private func refreshData() {
+        presenter.applyFilters(filters: CharacterFilter())
+        refreshControl.endRefreshing()
+    }
+    
+    @objc private func showFilterOptions() {
+        let filterVC = FilterViewController()
+        filterVC.delegate = self
+        let navVC = UINavigationController(rootViewController: filterVC)
+        present(navVC, animated: true)
+    }
+}
+
+// MARK: - Presenter Output
+extension CharacterListViewController: CharacterListPresenterOutput {
+    
+    func showCharacters(characters: [RMCharacter]) {
+        DispatchQueue.main.async {
+            self.characters = characters
+            self.tableView.reloadData()
+        }
+    }
+    
+    func showError(message: String) {
+        DispatchQueue.main.async {
+            let alert = UIAlertController(
+                title: "Error",
+                message: message,
+                preferredStyle: .alert
+            )
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            self.present(alert, animated: true)
+        }
+    }
+    
+    func showLoading() {
+        DispatchQueue.main.async {
+            self.loadingIndicator.startAnimating()
+        }
+    }
+    
+    func hideLoading() {
+        DispatchQueue.main.async {
+            self.loadingIndicator.stopAnimating()
+        }
+    }
+}
+
+
+// MARK: - TableView DataSource & Delegate
+extension CharacterListViewController: UITableViewDataSource, UITableViewDelegate {
+    //Количество строк
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return characters.count
+    }
+    
+    //Создание и настройка ячейки таблицы
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(
+            withIdentifier: CharacterCellView.reuseIdentifier,
+            for: indexPath
+        ) as? CharacterCellView else {
+            return UITableViewCell()
+        }
+        
+        let character = characters[indexPath.row]
+        cell.configure(with: character)
+        return cell
+    }
+    
+    //Триггерится при нажатии на ячейку таблицы
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        let character = characters[indexPath.row]
+        presenter.didSelectCharacter(character: character)
+    }
+    
+    //Загрузка следующей страницы
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let offsetY = scrollView.contentOffset.y
+        let contentHeight = scrollView.contentSize.height
+        let height = scrollView.frame.size.height
+        
+        if offsetY > contentHeight - height {
+            presenter.loadNextPage()
+        }
+    }
+}
+
+// MARK: - Filter Delegate
+extension CharacterListViewController: FilterDelegate {
+    func didApplyFilters(_ filters: CharacterFilter) {
+        presenter.applyFilters(filters: filters)
+    }
+    
+    func didResetFilters() {
+        presenter.resetFilters()
     }
 }

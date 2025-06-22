@@ -32,11 +32,13 @@ final class CharacterListPresenter {
     }
     
     private func fetchCharacters(page: Int, filters: CharacterFilter? = nil) {
-        guard hasNextPage, !isLoading else {return}
-        
+        guard hasNextPage, !isLoading else { return }
         isLoading = true
-        view?.showLoading()
         Task {
+            await MainActor.run {
+                view?.showLoading()
+            }
+            
             do {
                 let newCharacters = try await apiClient.fetchCharacters(page: page, filters: filters)
                 
@@ -46,17 +48,25 @@ final class CharacterListPresenter {
                     characters.append(contentsOf: newCharacters.results)
                 }
                 
-                view?.showCharacters(characters: characters)
-                
                 hasNextPage = newCharacters.info.next != nil
                 currentPage = page + 1
+                
+                await MainActor.run {
+                    view?.showCharacters(characters: characters)
+                }
             } catch {
-                view?.showError(message: error.localizedDescription)
+                await MainActor.run {
+                    view?.showError(message: error.localizedDescription)
+                }
             }
+            
             isLoading = false
-            view?.hideLoading()
+            await MainActor.run {
+                view?.hideLoading()
+            }
         }
     }
+
 }
 
 extension CharacterListPresenter: CharacterListPresenterInput {

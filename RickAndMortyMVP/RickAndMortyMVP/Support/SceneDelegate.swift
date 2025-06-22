@@ -16,9 +16,21 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let scene = (scene as? UIWindowScene) else { return }
         //2 init window
         self.window = UIWindow(windowScene: scene)
-        //3 root controller =
-        self.window?.rootViewController = ViewController()
-        //4 make visible
-        self.window?.makeKeyAndVisible()
+        // Сборка модуля
+        let navigationController = UINavigationController()
+        let assemblyBuilder = AssemblyBuilderDefault()
+        let router = RouterDefault(navigationController: navigationController, assemblyBuilder: assemblyBuilder)
+        let characterListVC = assemblyBuilder.createCharacterListModule(router: router)
+        
+        // Установка корневого контроллера
+        navigationController.viewControllers = [characterListVC]
+        window?.rootViewController = navigationController
+        window?.makeKeyAndVisible()
     }
+    
+    func sceneDidDisconnect(_ scene: UIScene) {}
+    func sceneDidBecomeActive(_ scene: UIScene) {}
+    func sceneWillResignActive(_ scene: UIScene) {}
+    func sceneWillEnterForeground(_ scene: UIScene) {}
+    func sceneDidEnterBackground(_ scene: UIScene) {}
 }
