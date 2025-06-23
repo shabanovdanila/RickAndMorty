@@ -7,6 +7,27 @@
 
 import Foundation
 
+extension Status {
+    var displayName: String {
+        switch self {
+        case .alive: return "Alive"
+        case .dead: return "Dead"
+        case .unknown: return "Unknown"
+        }
+    }
+}
+
+extension Gender {
+    var displayName: String {
+        switch self {
+        case .female: return "Female"
+        case .male: return "Male"
+        case .genderless: return "Genderless"
+        case .unknown: return "Unknown"
+        }
+    }
+}
+
 struct CharacterFilter {
     var name: String?
     var status: Status?
@@ -21,25 +42,10 @@ struct CharacterFilter {
     func toQueryItems() -> [URLQueryItem] {
         var items = [URLQueryItem]()
         if let name = name { items.append(URLQueryItem(name: "name", value: name)) }
-        if let status = status { items.append(URLQueryItem(name: "status", value: status.rawValue)) }
+        if let status = status { items.append(URLQueryItem(name: "status", value: status.displayName)) }
         if let species = species { items.append(URLQueryItem(name: "species", value: species)) }
         if let type = type { items.append(URLQueryItem(name: "type", value: type)) }
-        if let gender = gender { items.append(URLQueryItem(name: "gender", value: gender.rawValue)) }
+        if let gender = gender { items.append(URLQueryItem(name: "gender", value: gender.displayName)) }
         return items
-    }
-}
-
-extension CharacterFilter {
-    enum Status: String {
-        case alive = "Alive"
-        case dead = "Dead"
-        case unknown = "Unknown"
-    }
-    
-    enum Gender: String {
-        case female = "Female"
-        case male = "Male"
-        case unknown = "Unknown"
-        case genderless = "Genderless"
     }
 }
