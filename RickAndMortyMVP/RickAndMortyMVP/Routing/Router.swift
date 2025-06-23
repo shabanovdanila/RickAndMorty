@@ -14,7 +14,7 @@ protocol RouterMain {
 }
 
 protocol Router: RouterMain {
-    func initialViewController()
+    func setupRootViewController()
     //func showDetail(character: RMCharacter)
     func popToRoot()
 }
@@ -30,7 +30,7 @@ final class RouterDefault: Router {
         self.assemblyBuilder = assemblyBuilder
     }
     
-    func initialViewController() {
+    func setupRootViewController() {
         if let navigationController {
             guard let mainVC = assemblyBuilder?.createCharacterListModule(router: self) else { return }
             navigationController.viewControllers = [mainVC]

@@ -148,25 +148,26 @@ final class FilterViewController: UIViewController {
     }
     
     @objc private func statusChanged(_ sender: UISegmentedControl) {
-        currentFilters.status = sender.selectedSegmentIndex == 0 ? nil : {
+        currentFilters.status = {
             switch sender.selectedSegmentIndex {
-            case 1: return "alive"
-            case 2: return "dead"
-            case 3: return "unknown"
+            case 1: return .alive
+            case 2: return .dead
+            case 3: return .unknown
             default: return nil
             }
         }()
     }
-    
+
     @objc private func genderChanged(_ sender: UISegmentedControl) {
-        currentFilters.gender = sender.selectedSegmentIndex == 0 ? nil : {
+        currentFilters.gender = {
             switch sender.selectedSegmentIndex {
-            case 1: return "male"
-            case 2: return "female"
-            case 3: return "genderless"
-            case 4: return "unknown"
+            case 1: return .male
+            case 2: return .female
+            case 3: return .genderless
+            case 4: return .unknown
             default: return nil
             }
         }()
     }
+
 }

@@ -7,12 +7,24 @@
 
 import UIKit
 
-import UIKit
+struct CharacterViewModel {
+    let name: String
+    let status: String
+    let species: String
+    let imageUrl: String
+    
+    init(char: RMCharacter) {
+        self.name = char.name
+        self.status = char.status
+        self.species = char.species
+        self.imageUrl = char.image
+    }
+}
 
 final class CharacterListViewController: UIViewController {
     
     //TODO: - check is correct realization
-    private var characters: [RMCharacter] = []
+    private var characters: [CharacterViewModel] = []
     
     // MARK: - UI Elements
     private lazy var tableView: UITableView = {
@@ -96,35 +108,27 @@ final class CharacterListViewController: UIViewController {
 // MARK: - Presenter Output
 extension CharacterListViewController: CharacterListPresenterOutput {
     
-    func showCharacters(characters: [RMCharacter]) {
-        DispatchQueue.main.async {
-            self.characters = characters
-            self.tableView.reloadData()
-        }
+    func showCharacters(characters: [CharacterViewModel]) {
+        self.characters = characters
+        self.tableView.reloadData()
     }
     
     func showError(message: String) {
-        DispatchQueue.main.async {
-            let alert = UIAlertController(
-                title: "Error",
-                message: message,
-                preferredStyle: .alert
-            )
-            alert.addAction(UIAlertAction(title: "OK", style: .default))
-            self.present(alert, animated: true)
-        }
+        let alert = UIAlertController(
+            title: "Error",
+            message: message,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        self.present(alert, animated: true)
     }
     
     func showLoading() {
-        DispatchQueue.main.async {
-            self.loadingIndicator.startAnimating()
-        }
+        self.loadingIndicator.startAnimating()
     }
     
     func hideLoading() {
-        DispatchQueue.main.async {
-            self.loadingIndicator.stopAnimating()
-        }
+        self.loadingIndicator.stopAnimating()
     }
 }
 
@@ -153,8 +157,7 @@ extension CharacterListViewController: UITableViewDataSource, UITableViewDelegat
     //Триггерится при нажатии на ячейку таблицы
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let character = characters[indexPath.row]
-        presenter.didSelectCharacter(character: character)
+        presenter.didSelectCharacter(at: indexPath.row)
     }
     
     //Загрузка следующей страницы
@@ -164,7 +167,7 @@ extension CharacterListViewController: UITableViewDataSource, UITableViewDelegat
         let height = scrollView.frame.size.height
         
         if offsetY > contentHeight - height {
-            presenter.loadNextPage()
+            presenter.listScrolledToBottom()
         }
     }
 }

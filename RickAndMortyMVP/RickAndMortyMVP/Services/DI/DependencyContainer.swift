@@ -10,12 +10,11 @@ import Foundation
 final class DependencyContainer {
     
     static let shared = DependencyContainer()
-    
-    private let baseURL: String
+
     private let sharedNetWorkService: NetworkService
     
     private init() {
-        self.baseURL = "https://rickandmortyapi.com/api"
+        let baseURL = "https://rickandmortyapi.com/api"
         self.sharedNetWorkService = NetworkServiceDefault(baseURL: baseURL)
     }
     

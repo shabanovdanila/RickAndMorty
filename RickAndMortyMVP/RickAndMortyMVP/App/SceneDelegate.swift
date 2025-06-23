@@ -20,6 +20,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let navigationController = UINavigationController()
         let assemblyBuilder = AssemblyBuilderDefault()
         let router = RouterDefault(navigationController: navigationController, assemblyBuilder: assemblyBuilder)
+        router.setupRootViewController()
         let characterListVC = assemblyBuilder.createCharacterListModule(router: router)
         
         // Установка корневого контроллера

@@ -19,7 +19,7 @@ final class CharacterListPresenter {
     private var currentFilters: CharacterFilter?
     
     //MARK: - pagination
-    private var currentPage = 1
+    private var nextPage: Int = 0
     private var hasNextPage = true
     private var isLoading = false
     
@@ -31,7 +31,7 @@ final class CharacterListPresenter {
         self.apiClient = apiClient
     }
     
-    private func fetchCharacters(page: Int, filters: CharacterFilter? = nil) {
+    private func fetchCharacters(page: Int, filters: CharacterFilter? = nil, shouldReset: Bool = false) {
         guard hasNextPage, !isLoading else { return }
         isLoading = true
         Task {
@@ -42,17 +42,17 @@ final class CharacterListPresenter {
             do {
                 let newCharacters = try await apiClient.fetchCharacters(page: page, filters: filters)
                 
-                if page == 1 {
+                if shouldReset {
                     characters = newCharacters.results
                 } else {
                     characters.append(contentsOf: newCharacters.results)
                 }
                 
                 hasNextPage = newCharacters.info.next != nil
-                currentPage = page + 1
+                nextPage = page + 1
                 
                 await MainActor.run {
-                    view?.showCharacters(characters: characters)
+                    view?.showCharacters(characters: characters.map(CharacterViewModel.init))
                 }
             } catch {
                 await MainActor.run {
@@ -60,39 +60,39 @@ final class CharacterListPresenter {
                 }
             }
             
-            isLoading = false
             await MainActor.run {
+                isLoading = false
                 view?.hideLoading()
             }
         }
     }
-
 }
 
 extension CharacterListPresenter: CharacterListPresenterInput {
     
     func viewDidLoad() {
-        currentPage = 1
-        fetchCharacters(page: currentPage)
+        nextPage = 1
+        fetchCharacters(page: nextPage, shouldReset: true)
     }
     
-    func didSelectCharacter(character: RMCharacter) {
-        router.showCharacterDetails(character: character)
+    func didSelectCharacter(at index: Int) {
+        guard let char = characters[safe: index] else { return }
+        router.showCharacterDetails(character: char)
     }
     
-    func loadNextPage() {
-        fetchCharacters(page: currentPage, filters: currentFilters)
+    func listScrolledToBottom() {
+        fetchCharacters(page: nextPage, filters: currentFilters)
     }
     
     func applyFilters(filters: CharacterFilter) {
         currentFilters = filters
-        currentPage = 1
-        fetchCharacters(page: currentPage, filters: filters)
+        nextPage = 1
+        fetchCharacters(page: nextPage, filters: filters, shouldReset: true)
     }
     
     func resetFilters() {
         currentFilters = nil
-        currentPage = 1
-        fetchCharacters(page: currentPage)
+        nextPage = 1
+        fetchCharacters(page: nextPage, filters: nil, shouldReset: true)
     }
 }

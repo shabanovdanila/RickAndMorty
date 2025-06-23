@@ -53,13 +53,13 @@ final class CharacterCellView: UITableViewCell {
     }
 
     // MARK: - Configuration
-    func configure(with character: RMCharacter) {
+    func configure(with character: CharacterViewModel) {
         nameLabel.text = character.name
         statusLabel.text = "Status: \(character.status)"
         speciesLabel.text = "Species: \(character.species)"
         
         avatarImageView.image = nil
-        if let url = URL(string: character.image) {
+        if let url = URL(string: character.imageUrl) {
             loadImage(from: url)
         }
     }
@@ -78,9 +78,9 @@ final class CharacterCellView: UITableViewCell {
 
         URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             guard
-                let self = self,
-                let data = data,
-                let response = response,
+                let self,
+                let data,
+                let response,
                 let image = UIImage(data: data)
             else {
                 return

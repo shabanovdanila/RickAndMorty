@@ -8,15 +8,15 @@ import Foundation
 // View -> Presenter
 protocol CharacterListPresenterInput: AnyObject {
     func viewDidLoad()
-    func didSelectCharacter(character: RMCharacter)
-    func loadNextPage()
+    func didSelectCharacter(at index: Int)
+    func listScrolledToBottom()
     func applyFilters(filters: CharacterFilter)
     func resetFilters()
 }
 
 // Presenter -> View
 protocol CharacterListPresenterOutput: AnyObject {
-    func showCharacters(characters: [RMCharacter])
+    func showCharacters(characters: [CharacterViewModel])
     func showError(message: String)
     func showLoading()
     func hideLoading()
