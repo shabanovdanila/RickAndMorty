@@ -19,15 +19,27 @@ struct RMCharacter: Codable, Identifiable {
     let url: String
 }
 
-enum Status: Codable {
-    case alive
-    case dead
-    case unknown
+enum Status: String, Codable {
+    case Alive
+    case Dead
+    case Unknown
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let raw = try container.decode(String.self)
+        self = Status(rawValue: raw) ?? .Unknown
+    }
 }
 
-enum Gender: Codable {
-    case female
-    case male
-    case unknown
-    case genderless
+enum Gender: String, Codable {
+    case Female
+    case Male
+    case Unknown
+    case Genderless
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let raw = try container.decode(String.self)
+        self = Gender(rawValue: raw) ?? .Unknown
+    }
 }

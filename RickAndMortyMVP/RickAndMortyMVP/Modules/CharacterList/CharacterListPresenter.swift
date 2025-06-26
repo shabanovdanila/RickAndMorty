@@ -11,7 +11,7 @@ final class CharacterListPresenter {
 
     //MARK: - MVP
     weak var view: CharacterListPresenterOutput?
-    private let router: CharacterListRouterInput
+    private let router: CharacterListRouterInput?
     private let apiClient: CharacterClient
  
     //MARK: - properties
@@ -56,6 +56,7 @@ final class CharacterListPresenter {
                 }
             } catch {
                 await MainActor.run {
+                    print(error)
                     view?.showError(message: error.localizedDescription)
                 }
             }
@@ -77,7 +78,7 @@ extension CharacterListPresenter: CharacterListPresenterInput {
     
     func didSelectCharacter(at index: Int) {
         guard let char = characters[safe: index] else { return }
-        router.showCharacterDetails(character: char)
+        router?.showCharacterDetails(character: char)
     }
     
     func listScrolledToBottom() {

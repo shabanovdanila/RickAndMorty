@@ -7,27 +7,6 @@
 
 import Foundation
 
-extension Status {
-    var displayName: String {
-        switch self {
-        case .alive: return "Alive"
-        case .dead: return "Dead"
-        case .unknown: return "Unknown"
-        }
-    }
-}
-
-extension Gender {
-    var displayName: String {
-        switch self {
-        case .female: return "Female"
-        case .male: return "Male"
-        case .genderless: return "Genderless"
-        case .unknown: return "Unknown"
-        }
-    }
-}
-
 struct CharacterFilter {
     var name: String?
     var status: Status?

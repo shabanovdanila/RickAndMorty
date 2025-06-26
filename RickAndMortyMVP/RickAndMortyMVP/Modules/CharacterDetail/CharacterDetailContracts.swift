@@ -8,8 +8,8 @@
 import Foundation
 
 //Presenter -> View
-protocol CharacterDetailPresenterOutput {
-    func showCharacterDetail(character: CharacterDetailViewModel)
+protocol CharacterDetailPresenterOutput: AnyObject {
+    func showCharacterDetail(character: CharacterDetailViewModel, episodes: [String])
     func showFavoriteStatusChanged(isFavorite: Bool)
     func showError(message: String)
     func showLoading()
@@ -17,12 +17,12 @@ protocol CharacterDetailPresenterOutput {
 }
 
 //View -> Presenter
-protocol CharacterDetailPresenterInput {
+protocol CharacterDetailPresenterInput: AnyObject {
     func viewDidLoad()
     func addToFavoriteTapped()
 }
 
 //Presenter -> Router
-protocol CharacterDetailRouterInput {
+protocol CharacterDetailRouterInput: AnyObject {
     func backToMainScreen()
 }

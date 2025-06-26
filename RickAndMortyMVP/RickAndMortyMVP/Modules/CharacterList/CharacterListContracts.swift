@@ -23,6 +23,6 @@ protocol CharacterListPresenterOutput: AnyObject {
 }
 
 // Presenter -> Router
-protocol CharacterListRouterInput {
+protocol CharacterListRouterInput: AnyObject {
     func showCharacterDetails(character: RMCharacter)
 }
