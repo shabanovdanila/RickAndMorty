@@ -25,10 +25,18 @@ struct CharacterViewModel {
 
 final class CharacterListViewController: UIViewController {
     
-    //TODO: - check is correct realization
     private var characters: [CharacterViewModel] = []
     
     // MARK: - UI Elements
+    private lazy var rmLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Rick & Morty Characters"
+        label.font = UIFont.customFont(weight: 700, size: 24)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.register(CharacterCellView.self, forCellReuseIdentifier: CharacterCellView.reuseIdentifier)
@@ -75,7 +83,6 @@ final class CharacterListViewController: UIViewController {
     
     // MARK: - Setup
     private func setupUI() {
-        title = "Characters"
         view.backgroundColor = .systemBackground
         navigationItem.rightBarButtonItem = filterButton
         

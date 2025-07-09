@@ -30,3 +30,19 @@ final class RealmCharacter: Object {
         self.episodes.append(objectsIn: character.episode)
     }
 }
+
+extension RMCharacter {
+    init(from realmCharacter: RealmCharacter) {
+        self.init(
+            id: realmCharacter.id,
+            name: realmCharacter.name,
+            status: Status(rawValue: realmCharacter.statusRaw) ?? .Unknown,
+            species: realmCharacter.species,
+            gender: Gender(rawValue: realmCharacter.genderRaw) ?? .Unknown,
+            location: RMLocation(name: realmCharacter.locationName, url: realmCharacter.locationName),
+            image: realmCharacter.image,
+            episode: Array(realmCharacter.episodes),
+            url: ""
+        )
+    }
+}
