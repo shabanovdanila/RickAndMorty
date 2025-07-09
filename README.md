@@ -1,2 +1,2 @@
 # Rick And Morty 
-UIKit + MVP + URLSession + async/await + DI
+UIKit + MVP + URLSession + async/await + DI + Realm
