@@ -19,7 +19,7 @@ final class CharacterDetailPresenter {
     private var isLoading: Bool = false
     private let favoritesService: FavoriteStorageService
     private var isFavorite: Bool = false
-
+    
     init(view: CharacterDetailPresenterOutput,
          router: CharacterDetailRouterInput,
          apiClient: EpisodeClient,
@@ -31,7 +31,7 @@ final class CharacterDetailPresenter {
         self.character = character
         self.favoritesService = favoritesService
     }
-
+    
     
     private func fetchEpisodes() {
         guard !isLoading else { return }
@@ -61,8 +61,18 @@ final class CharacterDetailPresenter {
         }
     }
     
-    func addToFavorites(isFavorite: Bool) {
-        view?.showFavoriteStatusChanged(isFavorite: isFavorite)
+    private func updateFavoriteStatus() {
+        do {
+            if isFavorite {
+                try favoritesService.remove(character)
+            } else {
+                try favoritesService.add(character)
+            }
+            isFavorite.toggle()
+            view?.showFavoriteStatusChanged(isFavorite: isFavorite)
+        } catch {
+            view?.showError(message: "Failed to update favorites: \(error.localizedDescription)")
+        }
     }
 }
 
@@ -74,12 +84,6 @@ extension CharacterDetailPresenter: CharacterDetailPresenterInput {
     }
     
     func addToFavoriteTapped() {
-        if isFavorite {
-            favoritesService.remove(character)
-        } else {
-            favoritesService.add(character)
+            updateFavoriteStatus()
         }
-        isFavorite.toggle()
-        view?.showFavoriteStatusChanged(isFavorite: isFavorite)
-    }
 }

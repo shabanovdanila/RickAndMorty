@@ -26,4 +26,12 @@ final class DependencyContainer {
     func createEpisodeClient() -> EpisodeClientDefault {
         EpisodeClientDefault(networkService: sharedNetWorkService)
     }
+    
+    func createFavoriteStorageService() -> FavoriteStorageService {
+        do {
+            return try FavoriteStorageServiceDefault()
+        } catch {
+            fatalError("Failed to initialize FavoriteStorageService: \(error)")
+        }
+    }
 }

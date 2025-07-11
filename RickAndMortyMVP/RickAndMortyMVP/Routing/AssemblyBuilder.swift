@@ -26,7 +26,7 @@ final class AssemblyBuilderDefault: AssemblyBuilder {
     func createCharacterDetailModule(character: RMCharacter, router: CharacterDetailRouterInput) -> UIViewController {
         let view = CharacterDetailViewController()
         let apiClient = DependencyContainer.shared.createEpisodeClient()
-        let favoritesService = FavoriteStorageServiceDefault()
+        let favoritesService = DependencyContainer.shared.createFavoriteStorageService()
         let presenter = CharacterDetailPresenter(
             view: view,
             router: router,
