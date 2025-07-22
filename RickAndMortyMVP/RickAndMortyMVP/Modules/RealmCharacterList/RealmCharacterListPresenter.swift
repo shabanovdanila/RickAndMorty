@@ -28,15 +28,15 @@ final class RealmCharacterListPresenter {
         isLoading = true
         
         DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             
             self.view?.showLoading()
             
-            let characters = self.realmClient.getAllCharacters()
-            if characters.isEmpty {
+            self.characters = self.realmClient.getAllCharacters()
+            if self.characters.isEmpty {
                 self.view?.showEmptyList()
             } else {
-                self.view?.showCharacters(characters: characters.map(CharacterViewModel.init))
+                self.view?.showCharacters(characters: self.characters.map(CharacterViewModel.init))
             }
         
             self.isLoading = false
