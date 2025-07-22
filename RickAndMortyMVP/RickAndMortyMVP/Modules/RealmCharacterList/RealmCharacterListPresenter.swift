@@ -24,6 +24,35 @@ final class RealmCharacterListPresenter {
     }
     
     private func fetchCharactersFromRealm() {
-        characters = realmClient.getAllCharacters()
+        guard !isLoading else { return }
+        isLoading = true
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.view?.showLoading()
+            
+            let characters = self.realmClient.getAllCharacters()
+            if characters.isEmpty {
+                self.view?.showEmptyList()
+            } else {
+                self.view?.showCharacters(characters: characters.map(CharacterViewModel.init))
+            }
+        
+            self.isLoading = false
+            self.view?.hideLoading()
+        }
+    }
+}
+extension RealmCharacterListPresenter: RealmCharacterListPresenterInput {
+    func viewDidLoad() {
+        fetchCharactersFromRealm()
+    }
+    func viewWillAppear() {
+        fetchCharactersFromRealm()
+    }
+    func didSelectCharacter(at index: Int) {
+        guard let char = characters[safe: index] else { return }
+        router?.showCharacterDetailsRealm(character: char)
     }
 }

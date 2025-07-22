@@ -75,7 +75,10 @@ extension CharacterListPresenter: CharacterListPresenterInput {
         nextPage = 1
         fetchCharacters(page: nextPage, shouldReset: true)
     }
-    
+    func viewWillAppear() {
+        nextPage = 1
+        fetchCharacters(page: nextPage, shouldReset: true)
+    }
     func didSelectCharacter(at index: Int) {
         guard let char = characters[safe: index] else { return }
         router?.showCharacterDetails(character: char)

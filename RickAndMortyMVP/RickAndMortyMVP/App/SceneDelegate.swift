@@ -16,17 +16,25 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let scene = (scene as? UIWindowScene) else { return }
         //2 init window
         self.window = UIWindow(windowScene: scene)
-        // Сборка модуля
-        let navigationController = UINavigationController()
-        let assemblyBuilder = AssemblyBuilderDefault()
-        let router = RouterDefault(navigationController: navigationController, assemblyBuilder: assemblyBuilder)
-        router.setupRootViewController()
-        let characterListVC = assemblyBuilder.createCharacterListModule(router: router)
         
-        // Установка корневого контроллера
-        navigationController.viewControllers = [characterListVC]
-        window?.rootViewController = navigationController
+        let assemblyBuilder = AssemblyBuilderDefault()
+        let tabBarController = assemblyBuilder.createMainTabBarController()
+        
+        window?.rootViewController = tabBarController
         window?.makeKeyAndVisible()
+        
+        
+//        // Сборка модуля
+//        let navigationController = UINavigationController()
+//        let assemblyBuilder = AssemblyBuilderDefault()
+//        let router = RouterDefault(navigationController: navigationController, assemblyBuilder: assemblyBuilder)
+//        router.setupRootViewController()
+//        let characterListVC = assemblyBuilder.createCharacterListModule(router: router)
+//        
+//        // Установка корневого контроллера
+//        navigationController.viewControllers = [characterListVC]
+//        window?.rootViewController = navigationController
+//        window?.makeKeyAndVisible()
     }
     
     func sceneDidDisconnect(_ scene: UIScene) {}

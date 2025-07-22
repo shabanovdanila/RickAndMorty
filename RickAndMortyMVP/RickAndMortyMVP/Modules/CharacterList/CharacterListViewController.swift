@@ -7,22 +7,6 @@
 
 import UIKit
 
-struct CharacterViewModel {
-    let name: String
-    let status: String
-    let species: String
-    let imageUrl: String
-    let gender: String
-    
-    init(char: RMCharacter) {
-        self.name = char.name
-        self.status = char.status.displayName
-        self.species = char.species
-        self.imageUrl = char.image
-        self.gender = char.gender.displayName
-    }
-}
-
 final class CharacterListViewController: UIViewController {
     
     private var characters: [CharacterViewModel] = []
@@ -80,17 +64,24 @@ final class CharacterListViewController: UIViewController {
         setupUI()
         presenter.viewDidLoad()
     }
-    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        presenter.viewWillAppear()
+    }
     // MARK: - Setup
     private func setupUI() {
         view.backgroundColor = .systemBackground
         navigationItem.rightBarButtonItem = filterButton
         
+        view.addSubview(rmLabel)
         view.addSubview(tableView)
         view.addSubview(loadingIndicator)
         
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.topAnchor),
+            rmLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 100),
+            rmLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 100),
+            
+            tableView.topAnchor.constraint(equalTo: rmLabel.bottomAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
