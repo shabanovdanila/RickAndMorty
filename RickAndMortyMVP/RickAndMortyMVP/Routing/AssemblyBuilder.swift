@@ -10,73 +10,96 @@ import UIKit
 
 protocol AssemblyBuilder {
     func createMainTabBarController() -> UITabBarController
-    func createCharacterListModule(router: CharacterListRouterInput) -> UIViewController
-    func createCharacterDetailModule(character: RMCharacter, router: CharacterDetailRouterInput) -> UIViewController
-    func createRealmListModule(router: RealmCharacterListRouterInput) -> UIViewController
+    func createCharacterListModule(router: CharacterListRouterInput) -> CharacterListViewController
+    func createCharacterDetailModule(character: RMCharacter, router: CharacterDetailRouterInput) -> CharacterDetailViewController
+    func createRealmListModule(router: RealmCharacterListRouterInput) -> RealmCharacterListViewController
 }
 
 final class AssemblyBuilderDefault: AssemblyBuilder {
+    
+    //MARK: - Properties
+    private let dependencyContainer: DependencyContainer
+    
+    //MARK: - Init
+    init(dependencyContainer: DependencyContainer = DependencyContainer.shared) {
+        self.dependencyContainer = dependencyContainer
+    }
+    
     // MARK: - Main TabBar
     func createMainTabBarController() -> UITabBarController {
-        let tabBarController = UITabBarController()
+        let tabBarController = MainTabBarController()
         
-        // Настраиваем navigation controllers
         let charactersNavController = UINavigationController()
-        charactersNavController.tabBarItem = UITabBarItem(
-            title: "Characters",
-            image: UIImage(systemName: "person.2"),
-            selectedImage: UIImage(systemName: "person.2.fill")
-        )
+        charactersNavController.tabBarItem = makeTabBarItem(for: .characters)
         
         let favoritesNavController = UINavigationController()
-        favoritesNavController.tabBarItem = UITabBarItem(
-            title: "Favorites",
-            image: UIImage(systemName: "heart"),
-            selectedImage: UIImage(systemName: "heart.fill")
+        favoritesNavController.tabBarItem = makeTabBarItem(for: .favorites)
+        
+        let charactersRouter = RouterDefault(
+            navigationController: charactersNavController,
+            assemblyBuilder: self
+        )
+        let favoritesRouter = RouterDefault(
+            navigationController: favoritesNavController,
+            assemblyBuilder: self
         )
         
-        // Создаем роутеры для каждой вкладки с правильными параметрами
-        let charactersRouter = RouterDefault(navigationController: charactersNavController, assemblyBuilder: self)
-        let favoritesRouter = RouterDefault(navigationController: favoritesNavController, assemblyBuilder: self)
+        charactersNavController.viewControllers = [
+            createCharacterListModule(router: charactersRouter)
+        ]
+        favoritesNavController.viewControllers = [
+            createRealmListModule(router: favoritesRouter)
+        ]
         
-        // Создаем модули
-        let charactersModule = createCharacterListModule(router: charactersRouter)
-        let favoritesModule = createRealmListModule(router: favoritesRouter)
-        
-        // Устанавливаем root view controllers
-        charactersNavController.viewControllers = [charactersModule]
-        favoritesNavController.viewControllers = [favoritesModule]
-        
-        // Добавляем вкладки в TabBar
         tabBarController.viewControllers = [charactersNavController, favoritesNavController]
-        
         return tabBarController
     }
-
     
+    private func makeTabBarItem(for type: TabType) -> UITabBarItem {
+        switch type {
+        case .characters:
+            return UITabBarItem(
+                title: TabBarConstants.Titles.characters,
+                image: UIImage(systemName: TabBarConstants.Images.characters),
+                selectedImage: UIImage(systemName: TabBarConstants.Images.charactersFilled)
+            )
+        case .favorites:
+            return UITabBarItem(
+                title: TabBarConstants.Titles.favorites,
+                image: UIImage(systemName: TabBarConstants.Images.favorites),
+                selectedImage: UIImage(systemName: TabBarConstants.Images.favoritesFilled)
+            )
+        }
+    }
+    
+    //MARK: - Enums
+    private enum TabType {
+        case characters
+        case favorites
+    }
     
     //MARK: - Modules
-    func createRealmListModule(router: RealmCharacterListRouterInput) -> UIViewController {
+    func createRealmListModule(router: RealmCharacterListRouterInput) -> RealmCharacterListViewController {
         let view = RealmCharacterListViewController()
-        let realmClient = DependencyContainer.shared.createFavoriteStorageService()
+        let realmClient = dependencyContainer.createFavoriteStorageService()
         let presenter = RealmCharacterListPresenter(view: view, realmClient: realmClient, router: router)
         view.presenter = presenter
         return view
     }
     
     
-    func createCharacterListModule(router: CharacterListRouterInput) -> UIViewController {
+    func createCharacterListModule(router: CharacterListRouterInput) -> CharacterListViewController {
         let view = CharacterListViewController()
-        let apiClient = DependencyContainer.shared.createCharacterСlient()
+        let apiClient = dependencyContainer.createCharacterСlient()
         let presenter = CharacterListPresenter(view: view, router: router, apiClient: apiClient)
         view.presenter = presenter
         return view
     }
 
-    func createCharacterDetailModule(character: RMCharacter, router: CharacterDetailRouterInput) -> UIViewController {
+    func createCharacterDetailModule(character: RMCharacter, router: CharacterDetailRouterInput) -> CharacterDetailViewController {
         let view = CharacterDetailViewController()
-        let apiClient = DependencyContainer.shared.createEpisodeClient()
-        let favoritesService = DependencyContainer.shared.createFavoriteStorageService()
+        let apiClient = dependencyContainer.createEpisodeClient()
+        let favoritesService = dependencyContainer.createFavoriteStorageService()
         let presenter = CharacterDetailPresenter(
             view: view,
             router: router,
@@ -89,17 +112,14 @@ final class AssemblyBuilderDefault: AssemblyBuilder {
     }
 }
 
-extension RouterDefault: CharacterListRouterInput {
+//MARK: - Extensions
+extension RouterDefault: CharacterListRouterInput, RealmCharacterListRouterInput, CharacterDetailRouterInput {
     func showCharacterDetails(character: RMCharacter) {
         self.showDetail(character: character)
     }
-}
-extension RouterDefault: RealmCharacterListRouterInput {
     func showCharacterDetailsRealm(character: RMCharacter) {
         self.showDetail(character: character)
     }
-}
-extension RouterDefault: CharacterDetailRouterInput {
     func backToMainScreen() {
         self.popToRoot()
     }

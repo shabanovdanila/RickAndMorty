@@ -64,10 +64,10 @@ final class CharacterListViewController: UIViewController {
         setupUI()
         presenter.viewDidLoad()
     }
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        presenter.viewWillAppear()
-    }
+//    override func viewWillAppear(_ animated: Bool) {
+//        super.viewWillAppear(animated)
+//        presenter.viewWillAppear()
+//    }
     // MARK: - Setup
     private func setupUI() {
         view.backgroundColor = .systemBackground

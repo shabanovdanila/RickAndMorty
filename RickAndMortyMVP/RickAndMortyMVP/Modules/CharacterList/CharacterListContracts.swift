@@ -8,7 +8,7 @@ import Foundation
 // View -> Presenter
 protocol CharacterListPresenterInput: AnyObject {
     func viewDidLoad()
-    func viewWillAppear()
+//    func viewWillAppear()
     func didSelectCharacter(at index: Int)
     func listScrolledToBottom()
     func applyFilters(filters: CharacterFilter)
