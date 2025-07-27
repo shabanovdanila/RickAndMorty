@@ -30,6 +30,10 @@ final class CharacterListViewController: UIViewController {
         tableView.estimatedRowHeight = 100
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.refreshControl = refreshControl
+        tableView.showsVerticalScrollIndicator = false
+        tableView.separatorStyle = .none
+        tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 4, right: 0)
+        tableView.sectionFooterHeight = 16
         return tableView
     }()
     
@@ -64,10 +68,6 @@ final class CharacterListViewController: UIViewController {
         setupUI()
         presenter.viewDidLoad()
     }
-//    override func viewWillAppear(_ animated: Bool) {
-//        super.viewWillAppear(animated)
-//        presenter.viewWillAppear()
-//    }
     // MARK: - Setup
     private func setupUI() {
         view.backgroundColor = .systemBackground
@@ -78,16 +78,17 @@ final class CharacterListViewController: UIViewController {
         view.addSubview(loadingIndicator)
         
         NSLayoutConstraint.activate([
-            rmLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 100),
-            rmLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 100),
+            rmLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 66),
+            rmLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 57),
             
-            tableView.topAnchor.constraint(equalTo: rmLabel.bottomAnchor),
-            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            tableView.topAnchor.constraint(equalTo: rmLabel.bottomAnchor, constant: 24),
+            tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
+            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             
-            loadingIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            loadingIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+            //TODO
+            loadingIndicator.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            loadingIndicator.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor)
         ])
     }
     
@@ -135,12 +136,16 @@ extension CharacterListViewController: CharacterListPresenterOutput {
 
 // MARK: - TableView DataSource & Delegate
 extension CharacterListViewController: UITableViewDataSource, UITableViewDelegate {
-    //Количество строк
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    // Количество секций = количеству ячеек
+    func numberOfSections(in tableView: UITableView) -> Int {
         return characters.count
     }
     
-    //Создание и настройка ячейки таблицы
+    // В каждой секции только 1 ячейка
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 1
+    }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(
             withIdentifier: CharacterCellView.reuseIdentifier,
@@ -149,18 +154,31 @@ extension CharacterListViewController: UITableViewDataSource, UITableViewDelegat
             return UITableViewCell()
         }
         
-        let character = characters[indexPath.row]
+        let character = characters[indexPath.section] // Используем section вместо row
         cell.configure(with: character)
+        cell.contentView.backgroundColor = .clear
+        cell.backgroundColor = .clear
         return cell
     }
     
-    //Триггерится при нажатии на ячейку таблицы
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        presenter.didSelectCharacter(at: indexPath.row)
+    // Высота футера секции (создает отступ между ячейками)
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return 16
     }
     
-    //Загрузка следующей страницы
+    // Прозрачный футер для секции
+    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }
+    
+    // Обновляем didSelectRowAt для работы с секциями
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        presenter.didSelectCharacter(at: indexPath.section) // Используем section вместо row
+    }
+    
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let offsetY = scrollView.contentOffset.y
         let contentHeight = scrollView.contentSize.height
