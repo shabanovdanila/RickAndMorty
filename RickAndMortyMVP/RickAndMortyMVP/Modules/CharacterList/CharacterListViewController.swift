@@ -32,8 +32,6 @@ final class CharacterListViewController: UIViewController {
         tableView.refreshControl = refreshControl
         tableView.showsVerticalScrollIndicator = false
         tableView.separatorStyle = .none
-        tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 4, right: 0)
-        tableView.sectionFooterHeight = 16
         return tableView
     }()
     
@@ -70,7 +68,9 @@ final class CharacterListViewController: UIViewController {
     }
     // MARK: - Setup
     private func setupUI() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = UIColor.black
+        tableView.backgroundColor = UIColor.black
+        rmLabel.textColor = UIColor.white
         navigationItem.rightBarButtonItem = filterButton
         
         view.addSubview(rmLabel)
@@ -154,7 +154,7 @@ extension CharacterListViewController: UITableViewDataSource, UITableViewDelegat
             return UITableViewCell()
         }
         
-        let character = characters[indexPath.section] // Используем section вместо row
+        let character = characters[indexPath.section]
         cell.configure(with: character)
         cell.contentView.backgroundColor = .clear
         cell.backgroundColor = .clear
@@ -163,7 +163,7 @@ extension CharacterListViewController: UITableViewDataSource, UITableViewDelegat
     
     // Высота футера секции (создает отступ между ячейками)
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        return 16
+        return 4
     }
     
     // Прозрачный футер для секции
@@ -173,10 +173,9 @@ extension CharacterListViewController: UITableViewDataSource, UITableViewDelegat
         return view
     }
     
-    // Обновляем didSelectRowAt для работы с секциями
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        presenter.didSelectCharacter(at: indexPath.section) // Используем section вместо row
+        presenter.didSelectCharacter(at: indexPath.section)
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {

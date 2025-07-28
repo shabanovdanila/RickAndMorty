@@ -8,7 +8,7 @@ import UIKit
 
 final class CharacterCellView: UITableViewCell {
     static let reuseIdentifier = "CharacterCell"
-
+    
     // MARK: - UI Elements
     private let cardBackgroundView: UIView = {
         let view = UIView()
@@ -26,14 +26,14 @@ final class CharacterCellView: UITableViewCell {
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
-
+    
     private let nameLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.customFont(weight: 500, size: 18)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-
+    
     private let statusSpeciesLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.customFont(weight: 600, size: 12)
@@ -41,7 +41,7 @@ final class CharacterCellView: UITableViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-
+    
     
     private let genderLabel: UILabel = {
         let label = UILabel()
@@ -52,19 +52,23 @@ final class CharacterCellView: UITableViewCell {
     // MARK: - Init
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        self.selectionStyle = .none
+        let selectedView = UIView()
+        selectedView.backgroundColor = .black
+        self.selectedBackgroundView = selectedView
         setupUI()
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
     // MARK: - Configuration
     func configure(with character: CharacterViewModel) {
         nameLabel.text = character.name
         nameLabel.textColor = UIColor.white
         
         //status + species label
+        //TODO: - change color
         let statusColor: UIColor = character.status.lowercased() == "alive" ? .systemGreen : .white
 
         let statusText = NSAttributedString(
@@ -125,6 +129,7 @@ final class CharacterCellView: UITableViewCell {
     // MARK: - Setup
     private func setupUI() {
         contentView.addSubview(cardBackgroundView)
+        contentView.backgroundColor = UIColor.black
         cardBackgroundView.addSubview(avatarImageView)
         cardBackgroundView.addSubview(nameLabel)
         cardBackgroundView.addSubview(statusSpeciesLabel)
@@ -154,5 +159,16 @@ final class CharacterCellView: UITableViewCell {
             genderLabel.trailingAnchor.constraint(equalTo: statusSpeciesLabel.trailingAnchor),
             genderLabel.bottomAnchor.constraint(lessThanOrEqualTo: cardBackgroundView.bottomAnchor, constant: -18)
         ])
+    }
+}
+
+extension CharacterCellView {
+    override func setHighlighted(_ highlighted: Bool, animated: Bool) {
+        super.setHighlighted(highlighted, animated: animated)
+        UIView.animate(withDuration: 0.3) {
+            self.cardBackgroundView.backgroundColor = highlighted ? .darkGray : .grayCardRM
+            self.cardBackgroundView.transform = highlighted ?
+            CGAffineTransform(scaleX: 0.98, y: 0.98) : .identity
+        }
     }
 }
